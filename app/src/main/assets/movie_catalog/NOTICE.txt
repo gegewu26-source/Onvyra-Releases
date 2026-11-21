@@ -1,0 +1,7 @@
+影视配置发现来源记录
+
+来源：用户于2026-10-30提供的《影视接口功能_AI接入精简包.zip》。
+保留包中的ConfigDecoder.java、ConfigDiscovery.java及sources.json，作为配置数据发现参考核心与初始入口。
+sources.json包含57条基础配置和20个抓取入口，原包未逐一验证当前网络可用性。
+这些类只解析配置数据，不执行配置里的spider/JAR/JS；配置可读取、接口可搜索和视频可播放是独立状态。
+提供的CoreTest.java仅进入Android测试源码，不进入应用安装包。

@@ -1,0 +1,16 @@
+Inline video extraction components
+
+yt-dlp 2026.10.26, https://github.com/yt-dlp/yt-dlp
+Main project: Unlicense. This zipimport release also includes ISC licensed
+Meriyah and MIT licensed Astring components. See LICENSE-yt-dlp.txt and
+THIRD_PARTY_LICENSES-yt-dlp.txt for the original license texts and notices.
+
+youtubedl-android 0.18.1, https://github.com/yausername/youtubedl-android
+GPL-3.0. See LICENSE-youtubedl-android.txt.
+Maven coordinate: io.github.junkfood02.youtubedl-android:library:0.18.1
+Corresponding source artifacts and build-source links are documented in
+docs/third-party-video.md in the RikkaHub source distribution.
+
+The yt-dlp zipimport script is shipped unchanged. RikkaHub's integration
+initializes it on demand and requests metadata without downloading media.
+This integration does not invoke yt-dlp self-updates at runtime.

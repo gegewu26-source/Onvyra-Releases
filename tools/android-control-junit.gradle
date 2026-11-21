@@ -1,0 +1,45 @@
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.testing.Test
+
+// Optional init script: export freshly built test runtime files without starting Gradle's
+// test worker. No existing project build files or test tasks are replaced.
+abstract class ExportAndroidControlTestClasspath extends DefaultTask {
+    @Classpath
+    abstract ConfigurableFileCollection getTestRuntimeClasspath()
+
+    @OutputFile
+    abstract RegularFileProperty getClasspathFile()
+
+    @TaskAction
+    void exportClasspath() {
+        def output = classpathFile.get().asFile
+        output.parentFile.mkdirs()
+        output.setText(testRuntimeClasspath.files.collect { it.absolutePath }.join(File.pathSeparator) + '\n', 'UTF-8')
+        logger.lifecycle("Exported AndroidControl test classpath: ${output}")
+    }
+}
+
+gradle.projectsEvaluated {
+    // Init scripts also run in included builds (for example build-logic).
+    // They have no AndroidControl module and must not register these export tasks.
+    if (gradle.rootProject.findProject(':android-control') == null) return
+    [':android-control', ':app'].each { path ->
+        def target = gradle.rootProject.findProject(path)
+        if (target == null) throw new GradleException("Missing project ${path}")
+        // Unwrap during configuration so the Test TaskProvider itself is not propagated
+        // as an input-file producer. Only the classpath's build dependencies are executed.
+        def testTask = target.tasks.named('testDebugUnitTest', Test).get()
+        target.tasks.register('exportAndroidControlTestClasspath', ExportAndroidControlTestClasspath) {
+            group = 'verification'
+            description = 'Build and export the Debug JUnit runtime classpath without executing tests.'
+            testRuntimeClasspath.from(testTask.classpath)
+            dependsOn(testTask.classpath.buildDependencies)
+            classpathFile.set(target.layout.buildDirectory.file('control-test-classpath.txt'))
+        }
+    }
+}

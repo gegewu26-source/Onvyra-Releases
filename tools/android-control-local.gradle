@@ -1,0 +1,11 @@
+// Optional profile for the SDK/NDK installed on the validation Windows machine.
+// Apply explicitly with --init-script; this does not change the project's build versions.
+gradle.beforeProject { project ->
+    ['com.android.library', 'com.android.application'].each { pluginId ->
+        project.pluginManager.withPlugin(pluginId) {
+            def android = project.extensions.getByName('android')
+            android.ndkVersion = '29.0.14206865'
+            android.buildToolsVersion = '37.0.0'
+        }
+    }
+}

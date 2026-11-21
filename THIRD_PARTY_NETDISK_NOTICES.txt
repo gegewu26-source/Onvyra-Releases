@@ -1,0 +1,67 @@
+Onvyra 网盘本地解析功能：第三方来源与修改说明
+================================================
+
+本功能在 Android 设备本机执行分享链接识别、协议请求、签名与响应解析，
+不包含参考项目的解析中转服务器、远程统计、社区或更新组件。
+reader.50 另行接入下列 TurboDL 下载核心，不再使用系统下载器执行网盘下载。
+移植代码的原有版权归原作者及贡献者所有，适用 GNU AGPL-3.0；
+完整许可文本保存在本源码根目录 LICENSE 中，各移植文件保留来源声明。
+
+1. YunX（云析）
+   项目：https://github.com/CYQawa/YunX
+   参考版本：cc9afe24c9409b239c361263b976f7aad77d1d9e
+   Copyright (C) 2026 CYQawa and contributors
+   许可：GNU Affero General Public License v3.0，或文件所注明的更新版本。
+   参考范围：网盘分享目录、访问凭证、下载直链、必要账号协议及公开签名格式。
+
+2. YunGet（云取）
+   项目：https://github.com/jiayuxuan123/YunGet
+   参考版本：845932c48a04e5092bc6795e4dcb0fd67d202f10
+   Copyright (C) 2026 jiayuxuan123, CYQawa and contributors
+   许可：GNU Affero General Public License v3.0，或文件所注明的更新版本。
+   YunGet 是 YunX 的二次开发，YunX 的上游版权和协议声明继续保留。
+   参考范围：蓝奏子目录、新版参数、官方匿名分享与目录解析的兼容性改进。
+   reader.51 网盘列表还使用该固定版本的 10 个网盘标识图片，保存在
+   app/src/main/res/drawable-nodpi/netdisk_logo_*.png；仅用于识别对应服务。
+   对应服务的名称、商标和标识仍属于各自权利人。阿里云盘使用本地字母徽标。
+   reader.52 继续参考同一固定版本 Pan123Api.kt、QuarkApi.kt、UcApi.kt，
+   增加本人网盘的只读目录与文件取链接口；实现和来源注释在 NetDiskAccountRepository.kt。
+   reader.52 的123账号密码登录同样参考该固定版本Pan123Api.kt，保留原密码内容与code=200判断；
+   其他网页登录表单适配为本项目新实现，官网认证、验证码和必要的人工验证仍由各服务商处理。
+   reader.53 不再启用通用网页表单填充：仅123保留已实现的密码接口，其他平台直接使用官方登录。
+   reader.53 蓝奏本人目录读取继续参考该固定版本的 LanzouApi.kt，使用只读目录/文件列表协议；
+   不采用其会创建公开分享链接的个人文件下载路径。实现声明见 LanzouAccountBrowser.kt。
+   reader.54 继续参考同一固定版本的 LanzouApi、ILanzouApi、XunleiApi、GuangYaApi，
+   增加各自真实密码协议，迅雷/光鸭短信流程，以及优享/迅雷/光鸭本人只读目录和文件取链。
+   各文件保留来源与许可声明；不移植自动注册、创建分享、转存或删除云盘文件的流程。
+   阿里云盘使用其官方移动认证组件，保留官方密码、短信、协议与安全验证流程；
+   仅在最终官网回调保存新登录信息后导入，不使用通用网页表单填充。
+
+3. 用户提供的《本地解析能力清单.md》及本地 JxPan 技术摘录
+   清单位置：D:/AI-Agent-Data/Build/wangpan-parser/dist/本地解析能力清单.md
+   清单列明上游：https://github.com/ByLsPro/JxPan（灵衫Pro，2026.08.27）
+   用途：核对六家网盘的协议形态和运行环境约束。
+   本次没有把该目录的 JS parser 包、Worker、D1/KV 或页面整体复制到应用；
+   原生实现的移植来源以各文件所列 YunX/YunGet 声明为准。
+
+4. TurboDL（reader.50 新增的实际下载核心）
+   项目：https://github.com/jiayuxuan123/TurboDL
+   版本：0.5.0.6
+   固定源码：5b1c9af0575dff709ac0553fe6593433e1c4e0a7
+   Copyright (c) 2026 jiayuxuan123 and TurboDL contributors
+   许可：MIT；完整原文见 netdisk-download-engine/LICENSE-TurboDL.txt。
+   APK 携带同一许可资源 onvyra-licenses/TurboDL.txt。
+   完整 core 源码作为本地模块编译，仅使用其下载核心，不包含插件运行时、服务或遥测。
+   Onvyra 的宿主适配与本地补丁详见该模块 UPSTREAM.txt。
+
+Onvyra 适配改动
+---------------
+- 将分享协议适配到 Onvyra 原生 Kotlin/OkHttp 与统一数据模型。
+- 独立本机 Cookie 会话、取消、响应限长和跨域凭据处理。
+- 添加设置入口、用户提供的图标、目录浏览、官方网页登录和加密本地凭据。
+- reader.50 使用 TurboDL 执行本地并发下载，并由应用提供后台服务、任务管理和系统目录保存。
+- 需要转存的平台在用户明确确认之后才创建专用目录；不自动删除云盘文件。
+- 未复用第三方应用品牌、账号数据库、遥测、自动更新或后台解析服务。
+
+本源码包同时提供修改后的完整应用源码和许可文件。网络接口随服务商变化，
+协议测试或失效分享的业务错误不等同于真实分享已下载成功。

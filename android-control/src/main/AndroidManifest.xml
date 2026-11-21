@@ -1,0 +1,21 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <queries><intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent></queries>
+    <application>
+        <provider android:name="me.rerere.androidcontrol.shell.AndroidShellProvider" android:authorities="${applicationId}.android-control-shell" android:exported="true" android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+        <service android:name="me.rerere.androidcontrol.accessibility.AndroidControlAccessibilityService" android:label="Onvyra 手机操控" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" android:exported="true" android:stopWithTask="false">
+            <intent-filter><action android:name="android.accessibilityservice.AccessibilityService" /></intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/accessibility_service" />
+        </service>
+        <activity android:name="me.rerere.androidcontrol.ui.AndroidControlActivity" android:exported="false" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:label="手机操控" />
+        <service android:name="me.rerere.androidcontrol.ui.AndroidControlNotificationService" android:exported="false" android:foregroundServiceType="specialUse" android:stopWithTask="false">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="User-enabled phone control with authorized accessibility standby, visible persistent notification, stop-task and disable controls; isolated virtual display during active tasks" />
+        </service>
+        <service android:name="me.rerere.androidcontrol.ui.AndroidControlPairingService" android:exported="false" android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="User-started local wireless-debugging pairing with notification reply input, discovery timeout and explicit cancellation" />
+        </service>
+    </application>
+</manifest>

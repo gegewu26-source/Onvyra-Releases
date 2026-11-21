@@ -1,0 +1,42 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.cursor
+.history
+.kotlin
+
+# Owner signing and authorization material must stay outside source archives.
+*.jks
+*.keystore
+*.p12
+*.lineage
+signing.properties
+owner-key.json
+current-code.txt
+
+# Local release inputs and generated output
+onvyra-local/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+google-services.json
+credentials.json
+node_modules/
+dist/
+outputs/
+**/build/
+**/node_modules/
+
+# Files populated privately or generated for a personal build
+/config/private-video-endpoints.json
+/config/private-media-codebook.json

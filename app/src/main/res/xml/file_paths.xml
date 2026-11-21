@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+  <external-path name="netdisk_legacy_downloads" path="Download/Onvyra/网盘/" />
+  <cache-path
+    name="cache"
+    path="." />
+  <external-files-path
+    name="external_files"
+    path="." />
+  <files-path
+    name="upload"
+    path="." />
+</paths>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="chat_stats_input">输入 %1$d tokens</string>
+    <string name="chat_stats_output">输出 %1$d tokens</string>
+    <string name="chat_stats_total">合计 %1$d tokens</string>
+    <string name="chat_stats_cached">缓存 %1$d</string>
+    <string name="chat_stats_usage_pending">等待 Token 用量</string>
+    <string name="chat_stats_usage_missing">服务商未返回 Token 用量</string>
+    <string name="chat_stats_running">生成中 · %1$s 秒</string>
+    <string name="chat_stats_duration">总耗时 %1$s 秒</string>
+    <string name="chat_stats_speed">平均 %1$s tok/s</string>
+</resources>

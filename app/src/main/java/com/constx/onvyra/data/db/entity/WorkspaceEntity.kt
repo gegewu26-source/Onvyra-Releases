@@ -1,0 +1,56 @@
+package com.constx.onvyra.data.db.entity
+
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.constx.onvyra.utils.JsonInstant
+import me.rerere.workspace.Workspace
+import me.rerere.workspace.WorkspaceShellStatus
+
+@Entity(
+    tableName = "workspaces",
+    indices = [
+        Index(value = ["root"], unique = true),
+        Index(value = ["updated_at"]),
+    ],
+)
+data class WorkspaceEntity(
+    @PrimaryKey
+    val id: String,
+    @ColumnInfo("name")
+    val name: String,
+    @ColumnInfo("root")
+    val root: String,
+    @ColumnInfo("shell_status")
+    val shellStatus: String = WorkspaceShellStatus.DISABLED.name,
+    @ColumnInfo("created_at")
+    val createdAt: Long,
+    @ColumnInfo("updated_at")
+    val updatedAt: Long,
+    @ColumnInfo("last_access_at")
+    val lastAccessAt: Long? = null,
+    // 工具审批的用户覆盖项 (toolName -> needsApproval)，未覆盖的工具沿用默认值
+    @ColumnInfo("tool_approvals", defaultValue = "{}")
+    val toolApprovals: String = "{}",
+    @ColumnInfo("shell_compatibility_mode", defaultValue = "0")
+    val shellCompatibilityMode: Boolean = false,
+    // Whole-workspace availability is independent from whether a Linux shell is installed.
+    @ColumnInfo("enabled", defaultValue = "1")
+    val enabled: Boolean = true,
+) {
+    fun toolApprovalOverrides(): Map<String, Boolean> = runCatching {
+        JsonInstant.decodeFromString<Map<String, Boolean>>(toolApprovals)
+    }.getOrDefault(emptyMap())
+
+    fun toWorkspace(): Workspace = Workspace(
+        id = id,
+        name = name,
+        root = root,
+        shellStatus = runCatching { WorkspaceShellStatus.valueOf(shellStatus) }
+            .getOrDefault(WorkspaceShellStatus.DISABLED),
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        lastAccessAt = lastAccessAt,
+    )
+}

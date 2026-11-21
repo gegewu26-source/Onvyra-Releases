@@ -1,0 +1,360 @@
+package com.constx.onvyra.data.repository
+
+import android.util.Log
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runInterruptible
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import com.constx.onvyra.data.datastore.SettingsStore
+import com.constx.onvyra.data.db.dao.WorkspaceDAO
+import com.constx.onvyra.data.db.entity.WorkspaceEntity
+import com.constx.onvyra.utils.JsonInstant
+import me.rerere.workspace.RootfsInstallProgress
+import me.rerere.workspace.RootfsInstaller
+import me.rerere.workspace.WorkspaceCommandResult
+import me.rerere.workspace.WorkspaceFileEntry
+import me.rerere.workspace.WorkspaceManager
+import me.rerere.workspace.WorkspaceShellStatus
+import me.rerere.workspace.WorkspaceStorageArea
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.io.OutputStream
+import kotlin.uuid.Uuid
+
+class WorkspaceRepository(
+    private val dao: WorkspaceDAO,
+    private val manager: WorkspaceManager,
+    private val rootfsInstaller: RootfsInstaller,
+    private val settingsStore: SettingsStore,
+    private val onWorkspaceDisabled: suspend (root: String) -> Unit = {},
+) {
+    // Installation uses shared per-workspace staging paths and stored readiness. Keep the
+    // whole state transaction ordered, including restoration after cancellation or failure.
+    private val rootfsInstallMutex = Mutex()
+    private val operations = WorkspaceOperationRegistry()
+    fun listFlow(): Flow<List<WorkspaceEntity>> = dao.listFlow()
+
+    suspend fun checkIntegrity() = rootfsInstallMutex.withLock { withContext(Dispatchers.IO) {
+        val workspaces = dao.getAll()
+        for (workspace in workspaces) {
+            val dir = manager.workspaceDir(workspace.root)
+            if (!dir.exists()) {
+                // 目录缺失时不删除记录(例如恢复备份后工作区文件未随数据库一起恢复),
+                // 仅标记为 BROKEN 以保留记录与助手绑定, 避免误删用户工作区
+                Log.w(TAG, "Workspace directory missing, marking as broken: id=${workspace.id}, root=${workspace.root}")
+                if (workspace.shellStatus != WorkspaceShellStatus.BROKEN.name) {
+                    updateShellState(workspace.id, WorkspaceShellStatus.BROKEN.name)
+                }
+                continue
+            }
+            val statusName = workspace.shellStatus
+            val actualStatus = workspaceShellStateAfterIntegrity(statusName, manager.hasRootfs(workspace.root))
+            if (actualStatus != statusName) {
+                Log.w(TAG, "Recovering workspace shell status: id=${workspace.id}, status=$actualStatus")
+                updateShellState(workspace.id, actualStatus)
+            }
+        }
+    } }
+
+    suspend fun getById(id: String): WorkspaceEntity? = dao.getById(id)
+
+    suspend fun requireEnabled(id: String): WorkspaceEntity =
+        requireEnabledWorkspace(dao.getById(id))
+
+    suspend fun setEnabled(id: String, enabled: Boolean): Boolean {
+        var root: String? = null
+        return operations.setEnabled(id, enabled, persist = persist@{
+            val workspace = dao.getById(id) ?: return@persist false
+            root = workspace.root
+            dao.setEnabled(id, enabled, System.currentTimeMillis()) > 0
+        }, stopSessions = { root?.let { onWorkspaceDisabled(it) } })
+    }
+
+    suspend fun create(name: String): WorkspaceEntity {
+        val id = Uuid.random().toString()
+        val now = System.currentTimeMillis()
+        val finalName = name.trim().ifBlank { "Workspace" }
+        require(!isNameTaken(finalName, excludeId = null)) {
+            "Workspace name already exists: $finalName"
+        }
+        val workspace = WorkspaceEntity(
+            id = id,
+            name = finalName,
+            root = id,
+            createdAt = now,
+            updatedAt = now,
+            lastAccessAt = null,
+        )
+        manager.ensureWorkspace(workspace.root)
+        dao.upsert(workspace)
+        return workspace
+    }
+
+    suspend fun rename(id: String, name: String): Boolean {
+        val workspace = dao.getById(id) ?: return false
+        val finalName = name.trim().ifBlank { workspace.name }
+        require(!isNameTaken(finalName, excludeId = id)) {
+            "Workspace name already exists: $finalName"
+        }
+        return dao.rename(id, finalName, System.currentTimeMillis()) > 0
+    }
+
+    /** 名字是否已被其他 workspace 占用（trim 后精确匹配，排除 [excludeId] 自身） */
+    suspend fun isNameTaken(name: String, excludeId: String?): Boolean {
+        val target = name.trim()
+        return dao.getAll().any { it.id != excludeId && it.name.trim() == target }
+    }
+
+    suspend fun setShellCompatibilityMode(id: String, enabled: Boolean) {
+        dao.setShellCompatibilityMode(id, enabled, System.currentTimeMillis())
+    }
+
+    suspend fun setToolApproval(id: String, toolName: String, needsApproval: Boolean): Boolean {
+        val workspace = dao.getById(id) ?: return false
+        val overrides = workspace.toolApprovalOverrides() + (toolName to needsApproval)
+        return dao.updateToolApprovals(id, JsonInstant.encodeToString(overrides), System.currentTimeMillis()) > 0
+    }
+
+    suspend fun installRootfs(
+        id: String,
+        url: String,
+        onProgress: (RootfsInstallProgress) -> Unit = {},
+    ): Boolean = operations.run(id, checkEnabled = { requireEnabled(id) }) { rootfsInstallMutex.withLock {
+        val workspace = requireEnabled(id)
+        try {
+            runWorkspaceRootfsInstallation(
+                previousStatus = workspace.shellStatus,
+                hasUsableRootfs = { withContext(Dispatchers.IO) { manager.hasRootfs(workspace.root) } },
+                setStatus = { status -> updateShellState(workspace.id, status) },
+                install = {
+                    // Cancellation interrupts blocking download/extraction work.
+                    runInterruptible(Dispatchers.IO) {
+                        rootfsInstaller.install(workspace.root, url, onProgress)
+                    }
+                },
+            )
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            Log.e(TAG, "installRootfs failed: workspace=${workspace.id}, root=${workspace.root}, url=$url", e)
+            throw e
+        }
+    } }
+
+    suspend fun listFiles(
+        id: String,
+        area: WorkspaceStorageArea,
+        path: String,
+    ): List<WorkspaceFileEntry> = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.ensureWorkspace(workspace.root)
+        manager.listFiles(workspace.root, path, area)
+    }
+
+    suspend fun readText(
+        id: String,
+        path: String,
+    ): String = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.ensureWorkspace(workspace.root)
+        manager.readText(workspace.root, path)
+    }
+
+    suspend fun writeText(
+        id: String,
+        path: String,
+        text: String,
+        overwrite: Boolean,
+    ): WorkspaceFileEntry = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.ensureWorkspace(workspace.root)
+        manager.writeText(workspace.root, path, text, overwrite)
+    }
+
+    /**
+     * 读取文本用于应用内预览/编辑, 支持两个存储区.
+     * FILES 区走 [WorkspaceManager.readText] (自带大小保护); LINUX 区通过 exportFile 读入内存,
+     * 因此这里对 LINUX 区显式做大小限制, 避免大文件撑爆内存.
+     */
+    suspend fun readTextForPreview(
+        id: String,
+        area: WorkspaceStorageArea,
+        path: String,
+    ): String = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.ensureWorkspace(workspace.root)
+        when (area) {
+            WorkspaceStorageArea.FILES -> manager.readText(workspace.root, path)
+            WorkspaceStorageArea.LINUX -> {
+                val size = manager.fileSize(workspace.root, path, area)
+                require(size <= MAX_PREVIEW_BYTES) {
+                    "文件过大, 无法预览 (${size} bytes)"
+                }
+                ByteArrayOutputStream().use { out ->
+                    manager.exportFile(workspace.root, path, area, out)
+                    out.toString(Charsets.UTF_8.name())
+                }
+            }
+        }
+    }
+
+    suspend fun importFile(
+        id: String,
+        area: WorkspaceStorageArea,
+        destinationPath: String,
+        fileName: String,
+        inputStream: InputStream,
+    ): WorkspaceFileEntry = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.ensureWorkspace(workspace.root)
+        manager.importFile(workspace.root, destinationPath, area, fileName, inputStream)
+    }
+
+    suspend fun fileSize(
+        id: String,
+        area: WorkspaceStorageArea,
+        path: String,
+    ): Long = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.fileSize(workspace.root, path, area)
+    }
+
+    suspend fun resolveFile(
+        id: String,
+        area: WorkspaceStorageArea,
+        path: String,
+    ) = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.ensureWorkspace(workspace.root)
+        manager.resolveFile(workspace.root, path, area)
+    }
+
+    suspend fun exportFile(
+        id: String,
+        area: WorkspaceStorageArea,
+        path: String,
+        outputStream: OutputStream,
+    ) = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.exportFile(workspace.root, path, area, outputStream)
+    }
+
+    /** 按 Rootfs 内绝对路径读取文件大小, 支持 /workspace、bind mount 与 Rootfs 内部路径 */
+    suspend fun rootfsFileSize(
+        id: String,
+        path: String,
+    ): Long = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.ensureWorkspace(workspace.root)
+        manager.rootfsFileSize(workspace.root, path)
+    }
+
+    /** Rootfs 内执行命令实际使用的 shell 路径 (/bin/bash 或 /bin/sh) */
+    suspend fun rootfsShell(id: String): String = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.rootfsShell(workspace.root)
+    }
+
+    /** 按 Rootfs 内绝对路径导出文件内容, 支持 /workspace、bind mount 与 Rootfs 内部路径 */
+    suspend fun exportRootfsFile(
+        id: String,
+        path: String,
+        outputStream: OutputStream,
+    ) = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.ensureWorkspace(workspace.root)
+        manager.exportRootfsFile(workspace.root, path, outputStream)
+    }
+
+    suspend fun deleteFile(
+        id: String,
+        area: WorkspaceStorageArea,
+        path: String,
+        recursive: Boolean,
+    ): Boolean {
+        val deleted = withContext(Dispatchers.IO) {
+            val workspace = requireEnabled(id)
+            manager.deleteFile(workspace.root, path, recursive, area)
+        }
+        return deleted
+    }
+
+    suspend fun moveFile(
+        id: String,
+        source: String,
+        target: String,
+        overwrite: Boolean,
+    ): WorkspaceFileEntry = withContext(Dispatchers.IO) {
+        val workspace = requireEnabled(id)
+        manager.ensureWorkspace(workspace.root)
+        manager.moveFile(workspace.root, source, target, overwrite)
+    }
+
+    suspend fun executeCommand(
+        id: String,
+        command: String,
+        cwd: String = "",
+        timeoutMillis: Long = WorkspaceManager.DEFAULT_COMMAND_TIMEOUT_MS,
+        stdin: ByteArray? = null,
+    ): WorkspaceCommandResult = operations.run(id, checkEnabled = { requireEnabled(id) }) {
+        val workspace = requireEnabled(id)
+        // runInterruptible 让协程取消转化为线程中断，从而打断阻塞的 Process.waitFor 并杀掉进程
+        runInterruptible(Dispatchers.IO) {
+            manager.ensureWorkspace(workspace.root)
+            manager.executeCommand(
+                workspace.root, command, cwd, timeoutMillis, stdin,
+                shellCompatibilityMode = workspace.shellCompatibilityMode,
+            )
+        }
+    }
+
+    suspend fun delete(id: String): Boolean {
+        val workspace = dao.getById(id) ?: return false
+        dao.deleteById(id)
+        withContext(Dispatchers.IO) {
+            manager.deleteWorkspace(workspace.root)
+        }
+        cleanupAssistantReferences(id)
+        return true
+    }
+
+    private suspend fun cleanupAssistantReferences(workspaceId: String) {
+        settingsStore.update { settings ->
+            settings.copy(
+                assistants = settings.assistants.map { assistant ->
+                    if (assistant.workspaceId?.toString() == workspaceId) {
+                        assistant.copy(workspaceId = null)
+                    } else {
+                        assistant
+                    }
+                }
+            )
+        }
+    }
+
+    private suspend fun updateShellState(
+        workspace: WorkspaceEntity,
+        shellStatus: String,
+    ) = updateShellState(workspace.id, shellStatus)
+
+    private suspend fun updateShellState(
+        workspaceId: String,
+        shellStatus: String,
+    ) {
+        dao.updateShellStatus(
+            id = workspaceId,
+            shellStatus = shellStatus,
+            updatedAt = System.currentTimeMillis(),
+        )
+    }
+
+    companion object {
+        private const val TAG = "WorkspaceRepository"
+        private const val MAX_PREVIEW_BYTES = 512L * 1024
+    }
+}
+

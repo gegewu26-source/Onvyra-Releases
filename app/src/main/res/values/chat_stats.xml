@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="chat_stats_input">In %1$d tokens</string>
+    <string name="chat_stats_output">Out %1$d tokens</string>
+    <string name="chat_stats_total">Total %1$d tokens</string>
+    <string name="chat_stats_cached">Cached %1$d</string>
+    <string name="chat_stats_usage_pending">Waiting for token usage</string>
+    <string name="chat_stats_usage_missing">Token usage not reported</string>
+    <string name="chat_stats_running">Generating · %1$s s</string>
+    <string name="chat_stats_duration">Total time %1$s s</string>
+    <string name="chat_stats_speed">Avg %1$s tok/s</string>
+</resources>

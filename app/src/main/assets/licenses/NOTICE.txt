@@ -1,0 +1,13 @@
+Onvyra open-source notices
+
+Onvyra contains modified RikkaHub source code.
+Original source: https://github.com/rikkahub/rikkahub
+License: GNU Affero General Public License version 3. See AGPL-3.0.txt.
+The accompanying source archive provides the modified Onvyra source for this build.
+
+The Android phone-control module contains a modified subset of Mika and scrcpy.
+Its original copyright, license and third-party notices are retained in
+android-control-notices/ and in the accompanying source archive.
+
+Branding and product-facing links were changed for this build. Original license,
+copyright and source attribution notices remain in effect.

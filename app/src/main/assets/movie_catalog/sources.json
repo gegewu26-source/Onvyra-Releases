@@ -1,0 +1,308 @@
+{
+  "search_pages": [
+    "https://m.7xz.com/softs/43518.html",
+    "https://www.9k9k.com/app/52116.html",
+    "https://m.52pk.com/soft/37066zmfvyf.html",
+    "https://m.niucoo.cn/app/14651.html",
+    "https://shouyou.3dmgame.com/ios/532920.html",
+    "https://m.7po.com/rj/11305.html",
+    "https://flowus.cn/ahuage/share/0cee252a-9d5e-44bf-9603-67844b5dda2b",
+    "https://flowus.cn/share/1f2076ff-183f-4263-a0a2-6234fb89dcf1",
+    "https://jihulab.com/ygbh1/box/-/raw/main/dcang/dc2.json",
+    "https://jihulab.com/ygbh1/box/-/raw/main/dcang/ygbh.json",
+    "https://gitlab.com/ygbh1/666/-/raw/main/dcang/ygbh.json",
+    "https://yydsys.top/duo",
+    "https://xhdwc.tk/0",
+    "https://pastebin.com/raw/5NHaxyGR",
+    "https://agit.ai/Yoursmile7/TVBox/raw/branch/master/XC.json",
+    "https://agit.ai/relax/adcc/raw/branch/master/tvbox.json",
+    "https://codeberg.org/AK47/drpy-js/raw/branch/main/js.json",
+    "https://raw.githubusercontent.com/FongMi/CatVodSpider/main/json/config.json",
+    "https://raw.githubusercontent.com/gaotianliuyun/gao/master/js.json",
+    "https://raw.githubusercontent.com/wxrjck/-YSC-/refs/heads/main/wx.json"
+  ],
+  "base_lines": [
+    {
+      "name": "饭太硬",
+      "url": "http://www.饭太硬.net/tv"
+    },
+    {
+      "name": "饭太硬top",
+      "url": "http://饭太硬.top/tv"
+    },
+    {
+      "name": "饭太硬备用",
+      "url": "http://www.饭太硬.com/tv"
+    },
+    {
+      "name": "摸鱼儿",
+      "url": "http://我不是.摸鱼儿.com"
+    },
+    {
+      "name": "肥猫Panda",
+      "url": "http://我不是.肥猫.love:63/接口禁止贩卖"
+    },
+    {
+      "name": "肥猫",
+      "url": "http://肥猫.com"
+    },
+    {
+      "name": "肥猫live",
+      "url": "http://肥猫.live"
+    },
+    {
+      "name": "神秘哥哥备用",
+      "url": "http://fty.xxooo.cf/tv"
+    },
+    {
+      "name": "毒盒",
+      "url": "https://毒盒.com/tv/"
+    },
+    {
+      "name": "动漫城",
+      "url": "https://www.yingm.cc/dm/dm.json"
+    },
+    {
+      "name": "俊佬",
+      "url": "http://home.jundie.top:81/top98.json"
+    },
+    {
+      "name": "欧歌",
+      "url": "https://play.iptv365.org/欧歌/api.json"
+    },
+    {
+      "name": "小米",
+      "url": "https://play.iptv365.org/小米/api.json"
+    },
+    {
+      "name": "4K云盘",
+      "url": "https://9xi4o.tk/0725.json"
+    },
+    {
+      "name": "巧儿",
+      "url": "http://pandown.pro/tvbox/tvbox.json"
+    },
+    {
+      "name": "胖虎",
+      "url": "https://notabug.org/imbig66/tv-spider-man/raw/master/配置/0801.json"
+    },
+    {
+      "name": "传说",
+      "url": "https://chuanshuo.77blog.cn/tv.json"
+    },
+    {
+      "name": "宝盒接口",
+      "url": "http://宝盒接口.top"
+    },
+    {
+      "name": "高天流云",
+      "url": "https://raw.githubusercontent.com/gaotianliuyun/gao/master/js.json"
+    },
+    {
+      "name": "多多聚合",
+      "url": "https://raw.liucn.cc/box/dm.txt"
+    },
+    {
+      "name": "liucn-m",
+      "url": "https://raw.liucn.cc/box/m.json"
+    },
+    {
+      "name": "gitee自建",
+      "url": "https://gitee.com/lukei7/lib/raw/Luck/自建.json"
+    },
+    {
+      "name": "gitee-bls",
+      "url": "https://gitee.com/blssss/jk/raw/api/bls.json"
+    },
+    {
+      "name": "gitee青龙",
+      "url": "https://gitee.com/yiwu369/6758/raw/master/青龙/1.json"
+    },
+    {
+      "name": "dxawi",
+      "url": "https://dxawi.github.io/0/0.json"
+    },
+    {
+      "name": "kjsc0310",
+      "url": "https://kjsc0310.github.io/tvy/jk9.json"
+    },
+    {
+      "name": "猫技多仓",
+      "url": "https://agit.ai/ddx/TVBox/raw/branch/master/d.json"
+    },
+    {
+      "name": "月光宝盒多仓",
+      "url": "https://jihulab.com/ygbh1/box/-/raw/main/dcang/dc.json"
+    },
+    {
+      "name": "月光影视仓",
+      "url": "https://jihulab.com/ygbh1/box/-/raw/main/dcang/ygbh.json"
+    },
+    {
+      "name": "宝盒多仓2",
+      "url": "https://jihulab.com/ygbh1/box/-/raw/main/dcang/dc2.json"
+    },
+    {
+      "name": "宝盒max多仓",
+      "url": "https://agit.ai/butterfly/md/raw/branch/master/zYGBHmax"
+    },
+    {
+      "name": "多多接口多仓",
+      "url": "https://jihulab.com/duomv/apps/-/raw/main/fast.json"
+    },
+    {
+      "name": "多多多仓",
+      "url": "https://jihulab.com/duomv/apps/-/raw/main/duo.json"
+    },
+    {
+      "name": "影视仓多仓-52bsj",
+      "url": "http://52bsj.vip:98/xiaohu"
+    },
+    {
+      "name": "吾爱仓库",
+      "url": "http://52bsj.vip:98/wuaihosue"
+    },
+    {
+      "name": "小胡软件多仓",
+      "url": "https://agit.ai/xiaohu/tvbox/raw/branch/main/duocang"
+    },
+    {
+      "name": "云星日记仓库",
+      "url": "https://itvbox.cc/可视TV/云星日记/仓库.json"
+    },
+    {
+      "name": "猎狼多仓",
+      "url": "http://tvbox.lltv8.top"
+    },
+    {
+      "name": "多仓-134",
+      "url": "http://134.122.170.64/dc.json"
+    },
+    {
+      "name": "春风影视",
+      "url": "https://369936.xyz/web119"
+    },
+    {
+      "name": "欧哥仓",
+      "url": "http://tv.nxog.top"
+    },
+    {
+      "name": "日后仓",
+      "url": "http://rihou.cc:66/"
+    },
+    {
+      "name": "奇奇多仓",
+      "url": "https://cn.kstore.space/download/2904/123.txt"
+    },
+    {
+      "name": "D佬魔改线路",
+      "url": "https://download.kstore.space/download/2883/nzk/nzk0722.json"
+    },
+    {
+      "name": "蚂蚁线路",
+      "url": "https://cn.kstore.space/download/2883/0110.txt"
+    },
+    {
+      "name": "青龙线路",
+      "url": "https://6758.kstore.space/1.json"
+    },
+    {
+      "name": "fmys",
+      "url": "http://fmys.top/fmys.json"
+    },
+    {
+      "name": "奇奇",
+      "url": "http://z.qiqiv.cn/123"
+    },
+    {
+      "name": "kstore-wex",
+      "url": "https://9280.kstore.space/wex.json"
+    },
+    {
+      "name": "qxys",
+      "url": "https://7337.kstore.space/qxys/禁止传播.json"
+    },
+    {
+      "name": "weixine",
+      "url": "https://weixine.net/ysc.json"
+    },
+    {
+      "name": "zzzzz-tv",
+      "url": "https://zzzzz.tv/tv/ys.json"
+    },
+    {
+      "name": "zzzzz-svip",
+      "url": "https://zzzzz.tv/tv/svip.json"
+    },
+    {
+      "name": "qiaoji8",
+      "url": "http://cdn.qiaoji8.com/tvbox.json"
+    },
+    {
+      "name": "meowcf",
+      "url": "https://freed.yuanhsing.cf/TVBox/meowcf.json"
+    },
+    {
+      "name": "hcr-MMM",
+      "url": "https://agit.ai/hu/hcr/raw/branch/master/MMM.txt"
+    },
+    {
+      "name": "wds-223843",
+      "url": "https://wds.ecsxs.com/223843.txt"
+    }
+  ],
+  "skip_keywords": [
+    "github.com/",
+    "gitlab.com/",
+    "gitee.com/",
+    "zhihu.com",
+    "bilibili",
+    "baidu.com",
+    "google.com",
+    "bing.com",
+    "youtube",
+    "douyin",
+    "weibo",
+    "taobao",
+    "jd.com",
+    "xiaomi.com",
+    "360.cn",
+    "sohu",
+    "163.com",
+    "sina.com",
+    "cloudflare",
+    "jsdelivr.net",
+    "unpkg.com",
+    "gravatar",
+    "w3.org",
+    "mozilla.org",
+    "jquery",
+    "bootstrap",
+    "miit.gov.cn",
+    "flowus.cn",
+    "allflow.cn",
+    "staticfile.org"
+  ],
+  "line_keywords": [
+    "/tv",
+    "/box",
+    "/api",
+    ".json",
+    ".txt",
+    "/dc",
+    "kstore",
+    "jundie",
+    "catvod",
+    "tvbox",
+    "yingm",
+    "liucn",
+    "nxog",
+    "tspider",
+    "/dm/",
+    "dcang",
+    "仓库",
+    "线路",
+    "接口",
+    "配置"
+  ]
+}

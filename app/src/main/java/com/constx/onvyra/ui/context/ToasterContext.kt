@@ -1,0 +1,6 @@
+package com.constx.onvyra.ui.context
+
+import androidx.compose.runtime.staticCompositionLocalOf
+import me.rerere.ui.toast.ToasterState
+
+val LocalToaster = staticCompositionLocalOf<ToasterState> { error("Not provided") }

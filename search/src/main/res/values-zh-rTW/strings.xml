@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="bing_desc">無需 API 金鑰。優先使用 Bing，結果不足、無法取得或偏題時自動嘗試其他公開搜尋來源，合併去重並回傳真實網頁網址。遇到驗證碼時仍可能無法取得結果。</string>
+  <string name="click_to_get_api_key">點擊獲取API Key</string>
+  <string name="searxng_desc_1">settings.yml內需要開啟json format支援:</string>
+  <string name="searxng_desc_2">search:\n  formats:\n    - html\n    - json</string>
+  <string name="custom_js_desc">由 QuickJS 驅動的自訂搜尋提供者。實作 search(query, resultSize) 函式，並可選擇實作 scrape(urls) 函式。使用 fetch(url, options?) 進行 HTTP 請求。</string>
+</resources>
+

@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="me.rerere.androidcontrol.releaseprobe">
+    <uses-sdk android:minSdkVersion="34" android:targetSdkVersion="35" />
+    <application android:label="AndroidControl release test" android:hasCode="true" />
+    <instrumentation android:name="me.rerere.androidcontrol.releaseprobe.ControlReleaseProbe"
+        android:targetPackage="com.constx.onvyra.debug" android:label="AndroidControl optimized helper test" />
+</manifest>

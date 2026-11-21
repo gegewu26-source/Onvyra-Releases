@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!-- Match RouteActivity's rotation handling in the generic Compose test host. -->
+    <activity
+      android:name="androidx.activity.ComponentActivity"
+      android:configChanges="keyboardHidden|orientation|screenSize" />
+  </application>
+</manifest>

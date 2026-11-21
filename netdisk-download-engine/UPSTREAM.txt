@@ -1,0 +1,27 @@
+TurboDL core, 0.5.0.6
+https://github.com/jiayuxuan123/TurboDL
+Pinned source commit: 5b1c9af0575dff709ac0553fe6593433e1c4e0a7
+Upstream directory: turbodl-core/src/main/kotlin/dev/turbodl/core
+Copyright (c) 2026 jiayuxuan123 and TurboDL contributors
+License: MIT; complete original terms in LICENSE-TurboDL.txt.
+The same original license is packaged as the Java resource
+onvyra-licenses/TurboDL.txt so the binary distribution retains its notice.
+
+All 27 upstream core Kotlin files are retained. No optional plugin runtime,
+parser plugin, JS plugin, CLI, native binary, server, or remote-reporting component
+is included. The module is compiled against Onvyra's existing OkHttp and
+coroutines versions instead of introducing duplicate legacy dependencies.
+
+Onvyra wrapper:
+src/main/kotlin/com/constx/onvyra/netdisk/download/TurboNetDiskEngine.kt
+Each invocation owns its TurboClient, a stable private output and checkpoint
+directory; cancellation pauses, waits for worker cleanup, and retains progress.
+
+Local changes to upstream core:
+- MirrorHeaderPolicy.kt additionally strips cloud-provider share-token headers
+  on cross-origin mirrors and redirects.
+- BuiltinHttpBackend.kt reports a real switch to whole-stream fallback in its
+  metadata so the host does not keep labeling it as segmented mode.
+- BuiltinHttpBackend.kt strips origin credentials again when adopting a probe's
+  cross-origin final URL. The subsequent direct Range requests otherwise reset
+  RequestOrigin to that final host and could reattach the original credentials.

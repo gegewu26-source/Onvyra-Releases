@@ -1,0 +1,3 @@
+<resources>
+    <string name="settings_compact_web_access">LAN: use the device Wi-Fi IP address;\nLocal: use localhost (127.0.0.1);\nmDNS: use the .local host name.</string>
+</resources>

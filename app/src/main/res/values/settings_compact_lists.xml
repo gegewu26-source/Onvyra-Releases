@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_compact_my_assistants">My assistants</string>
+    <string name="settings_compact_search_providers">Search providers</string>
+</resources>

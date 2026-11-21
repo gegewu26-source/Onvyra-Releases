@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="compact_media_image_services">Image services</string>
+    <string name="compact_speech_service_providers">Service providers</string>
+</resources>

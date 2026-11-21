@@ -1,0 +1,13 @@
+ddddocr (https://github.com/sml2h3/ddddocr)
+Copyright (c) 2022 sml2h3 and contributors
+MIT License. The bundled model files are redistributed unmodified:
+  captcha/common_old.onnx        ddddocr/ddddocr/common_old.onnx
+  captcha/charset_old.json       the charset returned by
+                                 ddddocr/models/charset_manager.py:_get_old_charset
+The recognition pipeline in me.rerere.androidcontrol.captcha is a port of
+ddddocr's OCREngine preprocessing (height 64, aspect-preserving resize,
+8-bit greyscale, /255) and its CTC decoding rules. No ddddocr code is
+executed on the device; only the model weights and charset are used.
+
+ONNX Runtime for Android (https://github.com/microsoft/onnxruntime)
+Copyright (c) Microsoft Corporation. MIT License. Used as the inference runtime.
